@@ -45,4 +45,4 @@ Sinyal (Oranye) → Digital Pin 9 (PWM)
 2. Upload ke Arduino menggunakan Arduino IDE
 3. Hubungkan komponen sesuai diagram
 
- Jurnal](link)
+ 
