@@ -1,0 +1,61 @@
+#include <Servo.h>
+ 
+Servo jendela;
+
+const int pinAsap = A0;
+const int pinHujan = A1;
+const int pinCahaya = A2;
+const int pinServo = 9;
+
+// Batas threshold sensor
+int batasAsap = 500;     // MQ-2: lebih dari ini = ada asap
+int batasHujan = 600;    // Sensor hujan: kurang dari ini = hujan
+int batasCahaya = 300;   // LDR: lebih dari ini = gelap
+
+void setup() {
+  jendela.attach(pinServo);
+  Serial.begin(9600);
+  jendela.write(0); // Awal: tertutup
+}
+
+void loop() {
+  // Baca nilai sensor dua kali untuk validasi
+  int nilaiAsap1 = analogRead(pinAsap);
+  int nilaiHujan1 = analogRead(pinHujan);
+  int nilaiCahaya1 = analogRead(pinCahaya);
+
+  delay(200); // jeda sebelum pembacaan kedua
+  int nilaiAsap2 = analogRead(pinAsap);
+  int nilaiHujan2 = analogRead(pinHujan);
+  int nilaiCahaya2 = analogRead(pinCahaya);
+
+  // Ambil rata-rata untuk stabilitas
+  int nilaiAsap = (nilaiAsap1 + nilaiAsap2) / 2;
+  int nilaiHujan = (nilaiHujan1 + nilaiHujan2) / 2;
+  int nilaiCahaya = (nilaiCahaya1 + nilaiCahaya2) / 2;
+
+  // Debug: tampilkan nilai di Serial Monitor
+  Serial.print("Asap: "); Serial.print(nilaiAsap);
+  Serial.print(" | Hujan: "); Serial.print(nilaiHujan);
+  Serial.print(" | Cahaya: "); Serial.println(nilaiCahaya);
+
+  bool asapBerbahaya = nilaiAsap > batasAsap;
+  bool hujanTurun = nilaiHujan < batasHujan;
+  bool gelap = nilaiCahaya > batasCahaya;
+
+  if (asapBerbahaya) {
+    Serial.println(">> Deteksi Asap: JENDELA TERTUTUP <<");
+    jendela.write(0);
+  } else if (hujanTurun) {
+    Serial.println(">> Deteksi Hujan: JENDELA TERTUTUP <<");
+    jendela.write(0);
+  } else if (gelap) {
+    Serial.println(">> Deteksi Gelap: JENDELA TERTUTUP <<");
+    jendela.write(0);
+  } else {
+    Serial.println(">> Kondisi Aman: JENDELA TERBUKA <<");
+    jendela.write(180);
+  }
+
+  delay(1000); // tunggu sebelum loop berikutnya
+}
